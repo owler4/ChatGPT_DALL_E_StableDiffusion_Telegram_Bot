@@ -19,6 +19,7 @@ class StableDiffusion:
         answers = stability_api.generate(
             prompt=prompt + ", by Quentin Blake",
             seed=0,
+            style_preset="digital-art",
             steps=30,
             cfg_scale=7.0,
             width=1024,
