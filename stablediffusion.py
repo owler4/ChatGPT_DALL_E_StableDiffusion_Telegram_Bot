@@ -17,7 +17,7 @@ class StableDiffusion:
     def get_stable(prompt: str):
 
         answers = stability_api.generate(
-            prompt=prompt,
+            prompt=prompt + ", by Quentin Blake",
             seed=0,
             steps=30,
             cfg_scale=7.0,
