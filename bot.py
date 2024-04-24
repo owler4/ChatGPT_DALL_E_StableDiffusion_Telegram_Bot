@@ -77,7 +77,7 @@ async def question_handler(message: types.Message, state: FSMContext):
         keyboard = button, resize_keyboard=True
     )
     await message.answer(
-        text = "Enter your text: 👇🏻",
+        text = "Введите текст: 👇🏻",
         reply_markup=reply_markup,
     )
     option = message.text
