@@ -36,20 +36,20 @@ dp = Dispatcher()
 
 # Starts a conversation
 @dp.message(Command('start'))
-@dp.message(States.ENTRY_STATE, F.text.regexp(r'^🔙Back$'))
-@dp.message(States.CHATGPT_STATE, F.text.regexp(r'^🔙Back$'))
-@dp.message(States.DALL_E_STATE, F.text.regexp(r'^🔙Back$'))
-@dp.message(States.STABLE_STATE, F.text.regexp(r'^🔙Back$'))
-@dp.message(States.INFO_STATE, F.text.regexp(r'^🔙Back$'))
+@dp.message(States.ENTRY_STATE, F.text.regexp(r'^🔙 Назад$'))
+@dp.message(States.CHATGPT_STATE, F.text.regexp(r'^🔙 Назад$'))
+@dp.message(States.DALL_E_STATE, F.text.regexp(r'^🔙 Назад$'))
+@dp.message(States.STABLE_STATE, F.text.regexp(r'^🔙 Назад$'))
+@dp.message(States.INFO_STATE, F.text.regexp(r'^🔙 Назад$'))
 async def start(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     username = message.from_user.username
     result = await DataBase.is_user(user_id)
 
-    button = [[KeyboardButton(text="💭Chatting — ChatGPT")],
-              [KeyboardButton(text="🌄Image generation — DALL·E")],
-              [KeyboardButton(text="🌅Image generation — Stable Diffusion")],
-              [KeyboardButton(text="👤My account | 💰Buy")]]
+    button = [[KeyboardButton(text="🤖 AI-Ассистент")],
+              [KeyboardButton(text="🖼 Генерация иллюстраций")],
+              [KeyboardButton(text="🖼 Генерация иллюстраций САМПО")],
+              [KeyboardButton(text="👤 Профиль")]]
     reply_markup = ReplyKeyboardMarkup(
         keyboard = button, resize_keyboard=True
     )
@@ -57,22 +57,22 @@ async def start(message: types.Message, state: FSMContext):
     if not result:
         await DataBase.insert_user(user_id, username)
         await message.answer(
-            text = "👋You have: \n💭3000 ChatGPT tokens \n🌄3 DALL·E Image Generations \n🌅3 Stable Diffusion Image generations\n Choose an option: 👇 \n If buttons don't work, enter /start command",
+            text = "👋You have: \n💭3000 ChatGPT tokens \n🌄3 DALL·E Image Generations \n🌅3 Stable Diffusion Image generations\n Выберите вариант: 👇 \n или используйте /start",
             reply_markup=reply_markup,
         )
     else:
         await message.answer(
-            text = "Choose an option: 👇🏻 \n If buttons don't work, enter /start command",
+            text = "Выберите вариант: 👇🏻 \n или используйте /start",
             reply_markup=reply_markup,
         )
     await state.set_state(States.ENTRY_STATE)
 
 # Question Handling
-@dp.message(States.ENTRY_STATE, F.text.regexp(r'^💭Chatting — ChatGPT$'))
-@dp.message(States.ENTRY_STATE, F.text.regexp(r'^🌄Image generation — DALL·E$'))
-@dp.message(States.ENTRY_STATE, F.text.regexp(r'^🌅Image generation — Stable Diffusion$'))
+@dp.message(States.ENTRY_STATE, F.text.regexp(r'^🤖 AI-Ассистент$'))
+@dp.message(States.ENTRY_STATE, F.text.regexp(r'^🖼 Генерация иллюстраций$'))
+@dp.message(States.ENTRY_STATE, F.text.regexp(r'^🖼 Генерация иллюстраций САМПО$'))
 async def question_handler(message: types.Message, state: FSMContext):
-    button = [[KeyboardButton(text="🔙Back")]]
+    button = [[KeyboardButton(text="🔙 Назад")]]
     reply_markup = ReplyKeyboardMarkup(
         keyboard = button, resize_keyboard=True
     )
@@ -81,17 +81,17 @@ async def question_handler(message: types.Message, state: FSMContext):
         reply_markup=reply_markup,
     )
     option = message.text
-    if option == "💭Chatting — ChatGPT":
+    if option == "🤖 AI-Ассистент":
         await state.set_state(States.CHATGPT_STATE)
-    elif option == "🌄Image generation — DALL·E":
+    elif option == "🖼 Генерация иллюстраций":
         await state.set_state(States.DALL_E_STATE)
-    elif option == "🌅Image generation — Stable Diffusion":
+    elif option == "🖼 Генерация иллюстраций САМПО":
         await state.set_state(States.STABLE_STATE)
 
 # Answer Handling
 @dp.message(States.CHATGPT_STATE, F.text)
 async def chatgpt_answer_handler(message: types.Message, state: FSMContext):
-    button = [[KeyboardButton(text="🔙Back")]]
+    button = [[KeyboardButton(text="🔙 Назад")]]
     reply_markup = ReplyKeyboardMarkup(
         keyboard = button, resize_keyboard=True
     )
@@ -116,13 +116,13 @@ async def chatgpt_answer_handler(message: types.Message, state: FSMContext):
                 await DataBase.set_chatgpt(user_id, 0)
         else:
             await message.answer(
-                text = "❌Your request activated the API's safety filters and could not be processed. Please modify the prompt and try again.",
+                text = "❌ Преформулируйте, пожалуйста, ваш запрос.",
                 reply_markup=reply_markup,
             )
 
     else:
         await message.answer(
-            text = "❎You have 0 ChatGPT tokens. You need to buy them to use ChatGPT.",
+            text = "❌ Ошибка. обратитесь к администратору.",
             reply_markup=reply_markup,
         )
     await state.set_state(States.CHATGPT_STATE)
@@ -131,7 +131,7 @@ async def chatgpt_answer_handler(message: types.Message, state: FSMContext):
 # Answer Handling
 @dp.message(States.DALL_E_STATE, F.text)
 async def dall_e_answer_handler(message: types.Message, state: FSMContext):
-    button = [[KeyboardButton(text="🔙Back")]]
+    button = [[KeyboardButton(text="🔙 Назад")]]
     reply_markup = ReplyKeyboardMarkup(
         keyboard = button, resize_keyboard=True
     )
@@ -156,12 +156,12 @@ async def dall_e_answer_handler(message: types.Message, state: FSMContext):
             await DataBase.set_dalle(user_id, result)
         else:
             await message.answer(
-                text = "❌Your request activated the API's safety filters and could not be processed. Please modify the prompt and try again.",
+                text = "❌ Преформулируйте, пожалуйста, ваш запрос.",
                 reply_markup=reply_markup,
             )
     else:
         await message.answer(
-            text = "❎You have 0 DALL·E image generations. You need to buy them to use DALL·E.",
+            text = "❌ Ошибка. обратитесь к администратору.",
             reply_markup=reply_markup,
         )
     await state.set_state(States.DALL_E_STATE)
@@ -170,7 +170,7 @@ async def dall_e_answer_handler(message: types.Message, state: FSMContext):
 # Answer Handling
 @dp.message(States.STABLE_STATE, F.text)
 async def stable_answer_handler(message: types, state: FSMContext):
-    button = [[KeyboardButton(text="🔙Back")]]
+    button = [[KeyboardButton(text="🔙 Назад")]]
     reply_markup = ReplyKeyboardMarkup(
         keyboard = button, resize_keyboard=True
     )
@@ -197,25 +197,25 @@ async def stable_answer_handler(message: types, state: FSMContext):
             await DataBase.set_stable(user_id, result)
         else:
             await message.answer(
-                text = "❌Your request activated the API's safety filters and could not be processed. Please modify the prompt and try again.",
+                text = "❌ Преформулируйте, пожалуйста, ваш запрос.",
                 reply_markup=reply_markup,
             )
     else:
         await message.answer(
-            text = "❎You have 0 Stable Diffusion image generations. You need to buy them to use Stable Diffusion.",
+            text = "❌ Ошибка. обратитесь к администратору.",
             reply_markup=reply_markup,
         )
     await state.set_state(States.STABLE_STATE)
 
 
 # Displays information about user
-@dp.message(States.ENTRY_STATE, F.text.regexp(r'^👤My account | 💰Buy$'))
-@dp.message(States.PURCHASE_STATE, F.text.regexp(r'^🔙Back$'))
+@dp.message(States.ENTRY_STATE, F.text.regexp(r'^👤Профиль$'))
+@dp.message(States.PURCHASE_STATE, F.text.regexp(r'^🔙 Назад$'))
 async def display_info(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     result = await DataBase.get_userinfo(user_id)
 
-    button = [[KeyboardButton(text="💰Buy tokens and generations")], [KeyboardButton(text="🔙Back")]]
+    button = [[KeyboardButton(text="💰Buy tokens and generations")], [KeyboardButton(text="🔙 Назад")]]
     reply_markup = ReplyKeyboardMarkup(
         keyboard = button, resize_keyboard=True
     )
@@ -227,15 +227,15 @@ async def display_info(message: types.Message, state: FSMContext):
 
 
 # Displays goods
-@dp.message(States.INFO_STATE, F.text.regexp(r'^💰Buy tokens and generations$'))
-@dp.message(States.PURCHASE_CHATGPT_STATE, F.text.regexp(r'^🔙Back$'))
-@dp.message(States.PURCHASE_DALL_E_STATE, F.text.regexp(r'^🔙Back$'))
-@dp.message(States.PURCHASE_STABLE_STATE, F.text.regexp(r'^🔙Back$'))
+@dp.message(States.INFO_STATE, F.text.regexp(r'^Buy tokens and generations$'))
+@dp.message(States.PURCHASE_CHATGPT_STATE, F.text.regexp(r'^🔙 Назад$'))
+@dp.message(States.PURCHASE_DALL_E_STATE, F.text.regexp(r'^🔙 Назад$'))
+@dp.message(States.PURCHASE_STABLE_STATE, F.text.regexp(r'^🔙 Назад$'))
 async def purchase(message: types.Message, state: FSMContext):
     button = [[KeyboardButton(text="100K ChatGPT tokens - 5 USD💵")],
               [KeyboardButton(text="100 DALL·E image generations - 5 USD💵")],
               [KeyboardButton(text="100 Stable Diffusion image generations - 5 USD💵")],
-              [KeyboardButton(text="🔙Back")]]
+              [KeyboardButton(text="🔙 Назад")]]
     reply_markup = ReplyKeyboardMarkup(
         keyboard = button, resize_keyboard=True
     )
@@ -256,7 +256,7 @@ async def currencies(message: types.Message, state: FSMContext):
         KeyboardButton(text="💲TON")],
         [KeyboardButton(text="💲BTC"),
         KeyboardButton(text="💲ETH")],
-        [KeyboardButton(text="🔙Back")]
+        [KeyboardButton(text="🔙 Назад")]
     ]
     keyboard = ReplyKeyboardMarkup(
         keyboard = buttons,
