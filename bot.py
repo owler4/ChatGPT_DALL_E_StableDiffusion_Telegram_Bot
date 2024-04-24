@@ -57,7 +57,7 @@ async def start(message: types.Message, state: FSMContext):
     if not result:
         await DataBase.insert_user(user_id, username)
         await message.answer(
-            text = "👋You have: \n💭3000 ChatGPT tokens \n🌄3 DALL·E Image Generations \n🌅3 Stable Diffusion Image generations\n Выберите вариант: 👇 \n или используйте /start",
+            text = "Выберите вариант: 👇 \n или используйте /start",
             reply_markup=reply_markup,
         )
     else:
