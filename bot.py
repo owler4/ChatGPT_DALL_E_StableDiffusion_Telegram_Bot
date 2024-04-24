@@ -209,7 +209,7 @@ async def stable_answer_handler(message: types, state: FSMContext):
 
 
 # Displays information about user
-@dp.message(States.ENTRY_STATE, F.text.regexp(r'^👤Профиль$'))
+@dp.message(States.ENTRY_STATE, F.text.regexp(r'^👤 Профиль$'))
 @dp.message(States.PURCHASE_STATE, F.text.regexp(r'^🔙 Назад$'))
 async def display_info(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
